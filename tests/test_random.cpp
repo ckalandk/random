@@ -3,6 +3,12 @@
 #include <string>
 #include <vector>
 
+// --- COMPILE-TIME TESTS ---
+static_assert(rng::URBG<std::mt19937>, "std::mt19937 must satisfy URBG");
+static_assert(!rng::URBG<std::string>, "std::string must not satisfy URBG");
+static_assert(requires { typename rng::BitGen<std::mt19937>; });
+static_assert(!rng::URBG<double>, "URBG Must reject int");
+
 TEST_CASE("BitGen initialization and generation", "[BitGen]")
 {
     SECTION("Deterministic seeding yields identical results")
@@ -12,6 +18,24 @@ TEST_CASE("BitGen initialization and generation", "[BitGen]")
 
         REQUIRE(engine1() == engine2());
         REQUIRE(engine1() == engine2());
+    }
+
+    SECTION("Constructing from an existing random engine yields identical results")
+    {
+        std::mt19937 stdeng(42);
+        rng::BitGen rngeng(stdeng);
+
+        REQUIRE(stdeng() == rngeng());
+        REQUIRE(stdeng() == rngeng());
+    }
+
+    SECTION("Constructing using in place constructor")
+    {
+        std::mt19937 stdeng(42);
+        rng::BitGen<std::mt19937> rngeng(std::in_place_t{}, 42);
+
+        REQUIRE(stdeng() == rngeng());
+        REQUIRE(stdeng() == rngeng());
     }
 
     SECTION("Engine limits match underlying std::mt19937")
