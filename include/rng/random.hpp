@@ -128,6 +128,11 @@ public:
         _rnd_engine.seed(seq);
     }
 
+    BitGen(Engine rnd)
+        : _rnd_engine{std::move(rnd)}
+    {
+    }
+
     /**
      * @brief Explicitly seeds the engine with a specific value.
      * @param seed The deterministic seed value.
@@ -138,12 +143,41 @@ public:
     }
 
     /**
+     * @brief Explicitly seeds the engine with a seed sequence.
+     * @tparam Sseq The seed sequence type.
+     * @param seq the deterministic seed sequence.
+     */
+    template <typename Sseq>
+        requires(!std::same_as<std::remove_cvref_t<Sseq>, BitGen>)
+    explicit BitGen(Sseq &seq)
+        : _rnd_engine(seq)
+    {
+    }
+
+    template <typename... Args>
+    explicit BitGen(std::in_place_t, Args &&...args)
+        : _rnd_engine(std::forward<Args>(args)...)
+    {
+    }
+
+    /**
      * @brief Reseeds the engine.
      * @param s The new seed value.
      */
     void seed(result_type s)
     {
         _rnd_engine.seed(s);
+    }
+
+    /**
+     * @brief Reseeds the engine using a seed sequence.
+     * @param seq The new seed value.
+     */
+
+    template <typename SeedSeq>
+    void seed(SeedSeq &seq)
+    {
+        _rnd_engine.seed(seq);
     }
 
     /**
@@ -164,6 +198,22 @@ public:
         _rnd_engine.discard(z);
     }
 
+    friend bool operator==(const BitGen &lhs, const BitGen &rhs) = default;
+
+    template <class CharT, class Traits>
+    friend std::basic_ostream<CharT, Traits> &operator<<(
+        std::basic_ostream<CharT, Traits> &os, const BitGen &bg)
+    {
+        return os << bg._rnd_engine;
+    }
+
+    template <class CharT, class Traits>
+    friend std::basic_istream<CharT, Traits> &operator>>(
+        std::basic_istream<CharT, Traits> &is, BitGen &bg)
+    {
+        return is >> bg._rnd_engine;
+    }
+
 private:
     Engine _rnd_engine;
 };
@@ -174,7 +224,7 @@ inline thread_local BitGen default_engine{};
 
 /**
  * @brief Generates a random number uniformly distributed between [a, b].
- * * @tparam Tp The type of the lower bound.
+ * @tparam Tp The type of the lower bound.
  * @tparam Up The type of the upper bound.
  * @tparam Engine The type of the random engine.
  * @param a The lower bound (inclusive).
