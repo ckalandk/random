@@ -24,7 +24,7 @@ environments).
 ## 🚀 Quick Start
 
 ```cpp
-#include <rng/rng.h>
+#include <rng/random.hpp>
 #include <iostream>
 #include <vector>
 #include <string>

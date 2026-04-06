@@ -31,6 +31,39 @@ if(RNG_BUILD_TESTS)
   add_subdirectory(tests)
 endif()
 
+# ==========================================
+# 4. Optional Documentation (Doxygen)
+# ==========================================
+option(RNG_BUILD_DOCS "Build Doxygen HTML documentation" OFF)
+
+if(RNG_BUILD_DOCS)
+  find_package(Doxygen)
+
+  if(DOXYGEN_FOUND)
+    # Configure how Doxygen behaves
+    set(DOXYGEN_GENERATE_HTML YES)
+    set(DOXYGEN_GENERATE_MAN NO)
+    set(DOXYGEN_EXTRACT_ALL YES)
+    set(DOXYGEN_PROJECT_NAME "rng")
+    set(DOXYGEN_PROJECT_BRIEF "A modern, ergonomic C++23 random utility library.")
+
+    # This tells Doxygen to ignore your _detail namespace
+    set(DOXYGEN_EXCLUDE_SYMBOLS "rng::_detail")
+
+    # Automatically generates the documentation target
+    doxygen_add_docs(
+            rng_docs
+            ${CMAKE_CURRENT_SOURCE_DIR}/include # Path to your source files
+            ALL # Adds this to the default build target
+            COMMENT "Generating HTML documentation using Doxygen"
+        )
+
+    message(STATUS "Doxygen support enabled. Documentation will be built.")
+  else()
+    message(WARNING "Doxygen requested but not found. Please install Doxygen.")
+  endif()
+endif()
+
 install(TARGETS rng
     EXPORT rngTargets
     FILE_SET HEADERS
