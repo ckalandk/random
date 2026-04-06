@@ -14,7 +14,6 @@ target_sources(rng INTERFACE
   BASE_DIRS include
   FILES
     include/rng/random.hpp
-    include/rng/erased_rnd_engine.hpp
 )
 
 # ==========================================

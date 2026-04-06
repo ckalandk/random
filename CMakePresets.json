@@ -18,19 +18,72 @@
       }
     },
     {
+      "name": "docs",
+      "displayName": "Generate Documentation",
+      "description": "Configure Doxygen documentation generation",
+      "inherits": "base",
+      "cacheVariables": {
+        "RNG_BUILD_DOCS": "ON",
+        "RNG_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "clang-libcxx",
+      "displayName": "Clang C++23 configration with libcxx",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_CXX_FLAGS": "-stdlib=libc++",
+        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libc++",
+        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libc++",
+        "CMAKE_MODULE_LINKER_FLAGS": "-stdlib=libc++"
+      }
+    },
+    {
       "name": "clang",
       "displayName": "Clang C++23 configration",
       "inherits": "base",
       "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++",
-        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld -stdlib=libc++ -rtlib=compiler-rt --unwindlib=libgcc",
-        "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=lld -stdlib=libc++ -rtlib=compiler-rt",
-        "CMAKE_MODULE_LINKER_FLAGS": "-fuse-ld=lld -stdlib=libc++ -rtlib=compiler-rt"
+        "RNG_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "gcc",
+      "displayName": "GCC C++23 configration",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "RNG_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "examples",
+      "displayName": "Build Project Examples",
+      "inherits": "gcc",
+      "cacheVariables": {
+        "RNG_BUILD_EXAMPLES": "ON"
       }
     }
   ],
   "buildPresets": [
+    {
+      "name": "docs",
+      "configurePreset": "docs",
+      "targets": [
+        "rng_docs"
+      ]
+    },
+    {
+      "name": "examples",
+      "configurePreset": "examples",
+      "targets": [
+        "choice-demo"
+      ]
+    },
     {
       "name": "clang-debug",
       "configurePreset": "clang",
@@ -42,9 +95,117 @@
       "configurePreset": "clang",
       "configuration": "Release",
       "jobs": 4
+    },
+    {
+      "name": "gcc-debug",
+      "configurePreset": "gcc",
+      "configuration": "Debug",
+      "jobs": 4
+    },
+    {
+      "name": "gcc-release",
+      "configurePreset": "gcc",
+      "configuration": "Release",
+      "jobs": 4
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "clang-debug",
+      "configurePreset": "clang",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "clang-release",
+      "configurePreset": "clang",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "gcc-debug",
+      "configurePreset": "gcc",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "gcc-release",
+      "configurePreset": "gcc",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "clang-libcxx-debug",
+      "configurePreset": "clang-libcxx",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "clang-libcxx-release",
+      "configurePreset": "clang-libcxx",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
     }
   ],
   "workflowPresets": [
+    {
+      "name": "docs",
+      "displayName": "Full workflow: doxygen documentation",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "docs"
+        },
+        {
+          "type": "build",
+          "name": "docs"
+        }
+      ]
+    },
+    {
+      "name": "examples",
+      "displayName": "Full workflow: Project Examples",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "examples"
+        },
+        {
+          "type": "build",
+          "name": "examples"
+        }
+      ]
+    },
     {
       "name": "clang-debug",
       "displayName": "Full workflow: Clang Debug",
@@ -70,6 +231,34 @@
         {
           "type": "build",
           "name": "clang-release"
+        }
+      ]
+    },
+    {
+      "name": "gcc-debug",
+      "displayName": "Full workflow: GCC Debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "gcc"
+        },
+        {
+          "type": "build",
+          "name": "gcc-debug"
+        }
+      ]
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "Full workflow: GCC Release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "gcc"
+        },
+        {
+          "type": "build",
+          "name": "gcc-release"
         }
       ]
     }

@@ -1,3 +1,9 @@
 CompileFlags:
   CompilationDatabase: build
   Add: [-std=c++23]
+  Remove:
+    - -fmodules-ts
+    - -fmodule-mapper=*
+    - -fmodule-*
+    - -fdeps-*
+
